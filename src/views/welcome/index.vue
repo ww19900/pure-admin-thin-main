@@ -96,7 +96,12 @@
     </el-table>
     <div
       class="demo-pagination-block"
-      style="display: flex; align-items: center; justify-content: center"
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+      "
     >
       <el-pagination
         v-model:page-size="pageSize4"
@@ -149,8 +154,9 @@
             :action="'https://c2c.kuxia.top/pcapi/index/upload'"
             list-type="picture-card"
             multiple
-            :file-list="fileList"
+            v-model:file-list="fileList"
             :on-preview="handlePictureCardPreview"
+            :on-change="handleChange"
             limit:string="1"
             name="file"
             :on-success="succ"
@@ -369,6 +375,12 @@ const rules = reactive<FormRules>({
 });
 
 const submitForm = async (formEl: FormInstance | undefined) => {
+  if (fileLists.value.length <= 0) {
+    rule.image = "";
+  }
+  if (fileList.value.length <= 0) {
+    rule.img = "";
+  }
   const encodePwd = Base64.encode(rule.content); //加密
   if (!formEl) return;
   await formEl.validate(valid => {
@@ -416,7 +428,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           }
         });
       } else {
-        console.log(userid.value, rule);
         axios({
           url: "https://c2c.kuxia.top/pcapi/goods/update",
           params: {

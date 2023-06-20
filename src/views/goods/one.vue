@@ -40,7 +40,12 @@
     </el-table>
     <div
       class="demo-pagination-block"
-      style="display: flex; align-items: center; justify-content: center"
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+      "
     >
       <el-pagination
         v-model:page-size="pageSize4"
@@ -73,7 +78,7 @@
             :action="'https://c2c.kuxia.top/pcapi/index/upload'"
             list-type="picture-card"
             multiple
-            :file-list="fileList"
+            v-model:file-list="fileList"
             :on-preview="handlePictureCardPreview"
             limit:string="1"
             name="file"
@@ -188,14 +193,17 @@ const handlePictureCardPreview = file => {
   dialog.value = true;
   dialogImageUrl.value = file.url;
 };
-const succ = src => {
-  rule.img = src.url;
+const succ = () => {
+  rule.img = fileList.value[0].response.url;
 };
 const xinzeng = () => {
   title.value = "新增";
   dialogTableVisible.value = true;
 };
 const submitForm = async (formEl: FormInstance | undefined) => {
+  if (fileList.value.length <= 0) {
+    rule.img = "";
+  }
   if (!formEl) return;
   await formEl.validate(valid => {
     if (valid) {

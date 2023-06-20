@@ -31,7 +31,12 @@
     </el-table>
     <div
       class="demo-pagination-block"
-      style="display: flex; align-items: center; justify-content: center"
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+      "
     >
       <el-pagination
         v-model:page-size="pageSize4"

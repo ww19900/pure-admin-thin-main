@@ -42,7 +42,12 @@
     </el-table>
     <div
       class="demo-pagination-block"
-      style="display: flex; align-items: center; justify-content: center"
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+      "
     >
       <el-pagination
         v-model:page-size="pageSize4"
@@ -208,6 +213,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           console.log(src);
         });
       } else {
+        // console.log(userid.value, rule.id, rule.name);
         axios({
           url: "https://c2c.kuxia.top/pcapi/power/rule_update",
           params: {
@@ -249,11 +255,13 @@ const resetForm = (formEl: FormInstance | undefined) => {
 };
 
 const compile = data => {
+  console.log(data);
+
   status.value = "编辑";
   dial.value = true;
   userid.value = data.id;
   rule.name = data.name;
-  rule.id = data.id;
+  rule.id = data.pid;
 };
 const kong = () => {
   rule.name = "";
