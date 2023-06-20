@@ -5,7 +5,7 @@
         type="primary"
         :icon="Plus"
         style="margin-left: 15px"
-        @click="dialogFormVisible = true"
+        @click="xinze"
         >新增</el-button
       >
     </div>
@@ -165,30 +165,16 @@
           <el-upload
             :action="'https://c2c.kuxia.top/pcapi/index/upload'"
             list-type="picture-card"
-            :file-list="fileLists"
+            v-model:file-list="fileLists"
+            :on-change="handleChange"
             multiple
             limit:string="1"
-            :on-change="handleChanges"
-            :before-remove="beforeRemove"
             name="file"
             :on-success="succs"
           >
             <el-icon><Plus /></el-icon>
           </el-upload>
         </el-form-item>
-        <!-- <el-form-item label="商品轮播图片" prop="image">
-          <el-upload
-            :action="'https://c2c.kuxia.top/pcapi/index/upload'"
-            list-type="picture-card"
-            :file-list="fileLists"
-            multiple
-            limit:string="1"
-            name="file"
-            :on-success="succs"
-          >
-            <el-icon><Plus /></el-icon>
-          </el-upload>
-        </el-form-item> -->
         <el-form-item label="商品介绍" prop="content">
           <div style="border: 1px solid #ccc">
             <Toolbar
@@ -269,6 +255,13 @@ const pageSize4 = ref(5);
 const small = ref(false);
 const background = ref(true);
 const disabled = ref(false);
+
+const handleChange = () => {
+  console.log(fileLists.value);
+};
+// const beforeRemove = () => {
+//   console.log(fileLists.value);
+// };
 // ******************结束*******************
 axios({
   url: "https://c2c.kuxia.top/pcapi/goods/type_list"
@@ -339,6 +332,10 @@ const handleCurrentChange = (val: number) => {
 };
 
 // 新增表单
+const xinze = () => {
+  dialogFormVisible.value = true;
+  status.value = "新增";
+};
 const ruleFormRef = ref<FormInstance>();
 interface Person {
   tid: string;
@@ -372,13 +369,6 @@ const rules = reactive<FormRules>({
 });
 
 const submitForm = async (formEl: FormInstance | undefined) => {
-  console.log(fileLists.value, rule.image);
-  // if (fileLists.value.length <= 0) {
-  //   rule.image = "";
-  // }
-  // if (fileList.value.length <= 0) {
-  //   rule.img = "";
-  // }
   const encodePwd = Base64.encode(rule.content); //加密
   if (!formEl) return;
   await formEl.validate(valid => {
@@ -402,15 +392,15 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             status: rule.state
           }
         }).then(src => {
+          self_call();
           if (src.data.code == 1) {
-            self_call();
             ElMessage({
               message: src.data.msg,
               type: "success"
             });
-            dialogFormVisible.value = false;
+            self_call();
             formEl.resetFields();
-            // 空
+            dialogFormVisible.value = false;
             fileList.value = [];
             fileLists.value = [];
             rule.tid = "";
@@ -426,31 +416,29 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           }
         });
       } else {
-        console.log(rule);
+        console.log(userid.value, rule);
         axios({
           url: "https://c2c.kuxia.top/pcapi/goods/update",
           params: {
             id: userid.value,
             name: rule.name,
-            img: fileLists.value[0].response.url,
+            img: rule.img,
             tid: rule.tid,
             price: rule.price,
             stock: rule.num,
             introduce: encodePwd,
-            banner: fileLists.value[0].response.url,
+            banner: rule.image,
             status: rule.state
           }
         }).then(src => {
-          console.log(src);
           if (src.data.code == 1) {
-            self_call();
             ElMessage({
               message: src.data.msg,
               type: "success"
             });
-            dialogFormVisible.value = false;
+            self_call();
             formEl.resetFields();
-            // 空
+            dialogFormVisible.value = false;
             fileList.value = [];
             fileLists.value = [];
             rule.tid = "";
@@ -479,7 +467,6 @@ const resetForm = (formEl: FormInstance | undefined) => {
   dialogFormVisible.value = false;
   if (!formEl) return;
   formEl.resetFields();
-  // 空
   fileList.value = [];
   fileLists.value = [];
   rule.tid = "";
@@ -492,10 +479,8 @@ const resetForm = (formEl: FormInstance | undefined) => {
   rule.state = false;
 };
 
-// const qingkong = () => {};
 //编辑
 const compile = data => {
-  console.log(data);
   status.value = "编辑";
   userid.value = data.id;
   dialogFormVisible.value = true;
@@ -530,7 +515,6 @@ const delet = id => {
         }
       }).then(src => {
         if (src.data.code == 1) {
-          self_call();
           ElMessage({
             type: "success",
             message: "删除成功"
@@ -541,6 +525,7 @@ const delet = id => {
             message: "删除失败请刷新后重试"
           });
         }
+        self_call();
       });
     })
     .catch(() => {
@@ -575,13 +560,12 @@ const handlePictureCardPreview = file => {
   dialogImageUrl.value = file.url;
 };
 
-const succ = src => {
-  rule.img = src.url;
-  console.log(src.url);
+const succ = () => {
+  rule.img = fileList.value[0].response.url;
 };
-const succs = src => {
-  rule.image = src.url;
-  console.log(fileLists.value);
+const succs = () => {
+  rule.image = fileLists.value[0].response.url;
+  console.log(fileLists.value[0].response.url);
 };
 </script>
 
